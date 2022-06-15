@@ -6,35 +6,66 @@ import {TimelineMax } from "gsap"
 
 const OrbitControls = require("three-orbit-controls")(THREE)
 
-export default class Sketch {
-    constructor(selector) {
-        this.scene = new THREE.Scene()
-        this.renderer = new THREE.WebGLRenderer()
-        
-        this.renderer.setPixelRatio(window.devicePixelRatio)
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
-        this.renderer.setClearColor(0xeeeeee, 1)
-
-        this.container = document.getElementById(selector)
-        this.width = this.container.offsetWidth
-        this.height = this.container.offsetHeight
-        this.container.appendChild(this.renderer.domElement)
-
-        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth/ window.innerHeight, 0.001, 1000)
-        this.camera.position.set(0, 0, 2)
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+export default class Scene {
+    constructor(el) {
+        console.log(el)
+        this.canvas = el
+        this.width = this.canvas.offsetWidth
+        this.height = this.canvas.offsetHeight
         this.time = 0
         this.paused = false
 
-        this.setupResize()
+        this.setScene()
+        this.setRender()
+        this.setCamera()
+        this.setControls()
 
         this.addObjects()
-        
+
+        this.setupResize()
         this.resize()
 
         this.render()
     }
 
+    setScene() {
+        this.scene = new THREE.Scene()
+        this.scene.background = new THREE.Color(0xffffff)
+    }
+    setRender() {
+        this.renderer = new THREE.WebGLRenderer({
+            // canvas: this.canvas,
+            antialias: true
+        })
+
+        this.renderer.setPixelRatio(window.devicePixelRatio)
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
+        this.renderer.setClearColor(0xeeeeee, 1)
+
+        this.canvas.appendChild(this.renderer.domElement)
+    }
+
+    setCamera() {
+        const aspectRatio = window.innerWidth / window.innerHeight
+        const fieldOfView = 70
+        const nearPlane = 0.1
+        const farPlane = 10000
+        this.camera = new THREE.PerspectiveCamera(
+            fieldOfView,
+            aspectRatio,
+            nearPlane,
+            farPlane
+        )
+        this.camera.position.set(0, 0, 2)
+    
+        this.scene.add(this.camera)
+    }
+    
+    setControls() {
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+        this.controls.autoRotate = true
+    }
+    
     settings() {
         this.settings = {
             time: 0
@@ -44,8 +75,8 @@ export default class Sketch {
     }
 
     resize() {
-        this.width = this.container.offsetWidth
-        this.height = this.container.offsetHeight
+        this.width = this.canvas.offsetWidth
+        this.height = this.canvas.offsetHeight
         this.renderer.setSize(this.width, this.height)
         this.camera.aspect = this.width / this.height
 
@@ -56,22 +87,23 @@ export default class Sketch {
     }
 
     addObjects() {
-        /* // MeshBasicMaterial
+        // MeshBasicMaterial
         this.material = new THREE.MeshBasicMaterial({
             color: 0xff0f0f,
-            side: THREE.DoubleSide
-        }) */
+            wireframe: true
+            // side: THREE.DoubleSide
+        })
 
         // ShaderMaterial
-        this.material = new THREE.ShaderMaterial({
-            side: THREE.DoubleSide,
-            vertexShader: vertex,
-            fragmentShader: fragment,
-            uniforms: {
+        // this.material = new THREE.ShaderMaterial({
+        //     side: THREE.DoubleSide,
+        //     vertexShader: vertex,
+        //     fragmentShader: fragment,
+        //     uniforms: {
                 
-            }
-        })
-        this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1)
+        //     }
+        // })
+        this.geometry = new THREE.SphereGeometry(1, 32, 32)
 
         this.plane = new THREE.Mesh(this.geometry, this.material)
 
@@ -95,4 +127,4 @@ export default class Sketch {
     }
 }
 
-new Sketch('container')
+new Scene(document.getElementById('container'))

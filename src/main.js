@@ -19,7 +19,8 @@ export default class Scene {
         this.setRender()
         this.setCamera()
         this.setControls()
-
+        
+        this.addLight()
         this.addObjects()
 
         this.setupResize()
@@ -66,6 +67,11 @@ export default class Scene {
         this.controls.autoRotate = true
     }
     
+    addLight() {
+        this.light = new THREE.DirectionalLight(0xffffff, 5)
+        this.scene.add(this.light)
+    }
+
     settings() {
         this.settings = {
             time: 0
@@ -100,7 +106,7 @@ export default class Scene {
         //     vertexShader: vertex,
         //     fragmentShader: fragment,
         //     uniforms: {
-                
+        //         uColor: { value: new THREE.Color(0x51b1f5) }
         //     }
         // })
         this.geometry = new THREE.SphereGeometry(1, 32, 32)

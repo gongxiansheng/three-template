@@ -8,6 +8,7 @@ package-lock.json
 tests/**/coverage/
 
 # Editor directories and files
+.cache
 .idea
 .vscode
 *.suo

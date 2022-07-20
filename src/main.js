@@ -1,10 +1,10 @@
 import * as THREE from 'three'
-import* as dat from 'dat.gui'
+import * as dat from 'dat.gui'
 import fragment from './shader/fragment.glsl'
 import vertex from './shader/vertex.glsl'
-import {TimelineMax } from "gsap"
+import { TimelineMax } from "gsap"
 
-const OrbitControls = require("three-orbit-controls")(THREE)
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 export default class Scene {
     constructor(el) {
@@ -19,7 +19,7 @@ export default class Scene {
         this.setRender()
         this.setCamera()
         this.setControls()
-        
+
         this.addLight()
         this.addObjects()
 
@@ -58,15 +58,18 @@ export default class Scene {
             farPlane
         )
         this.camera.position.set(0, 0, 2)
-    
+
         this.scene.add(this.camera)
     }
-    
+
     setControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement)
-        this.controls.autoRotate = true
+
+        // this.controls.autoRotate = true
+        // this.controls.autoRotateSpeed = .2
+        this.controls.enableDamping = true
     }
-    
+
     addLight() {
         this.light = new THREE.DirectionalLight(0xffffff, 5)
         this.scene.add(this.light)
@@ -94,22 +97,23 @@ export default class Scene {
 
     addObjects() {
         // MeshBasicMaterial
-        this.material = new THREE.MeshBasicMaterial({
-            color: 0xff0f0f,
-            wireframe: true
-            // side: THREE.DoubleSide
-        })
+        // this.material = new THREE.MeshBasicMaterial({
+        //     color: 0xff0f0f,
+        //     wireframe: true
+        //     // side: THREE.DoubleSide
+        // })
 
         // ShaderMaterial
-        // this.material = new THREE.ShaderMaterial({
-        //     side: THREE.DoubleSide,
-        //     vertexShader: vertex,
-        //     fragmentShader: fragment,
-        //     uniforms: {
-        //         uColor: { value: new THREE.Color(0x51b1f5) }
-        //     }
-        // })
-        this.geometry = new THREE.SphereGeometry(1, 32, 32)
+        this.material = new THREE.ShaderMaterial({
+            side: THREE.DoubleSide,
+            vertexShader: vertex,
+            fragmentShader: fragment,
+            uniforms: {
+                uColor: { value: new THREE.Color(0x51b1f5) },
+                time: { type: 'f', value: this.time },
+            }
+        })
+        this.geometry = new THREE.PlaneGeometry(1)
 
         this.plane = new THREE.Mesh(this.geometry, this.material)
 
@@ -128,6 +132,8 @@ export default class Scene {
     render() {
         if (this.paused) return
         this.time += 0.05
+        this.material.uniforms['time'].value = this.time
+        this.controls.update();
         requestAnimationFrame(this.render.bind(this))
         this.renderer.render(this.scene, this.camera)
     }

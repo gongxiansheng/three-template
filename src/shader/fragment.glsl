@@ -1,6 +1,9 @@
 uniform sampler2D pointTexture;
+uniform float time;
+uniform vec4 resolution;
 uniform vec3 uColor;
-varying vec3 vColor;
+varying vec2 vUv;
+varying vec3 vPosition;
 
 void main() {
 

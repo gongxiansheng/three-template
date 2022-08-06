@@ -6,9 +6,10 @@ import { TimelineMax } from "gsap"
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
+import earth from './texture/earth.jpg'
+
 export default class Scene {
     constructor(el) {
-        console.log(el)
         this.canvas = el
         this.width = this.canvas.offsetWidth
         this.height = this.canvas.offsetHeight
@@ -31,7 +32,7 @@ export default class Scene {
 
     setScene() {
         this.scene = new THREE.Scene()
-        this.scene.background = new THREE.Color(0xffffff)
+        this.scene.background = new THREE.Color(0x000000)
     }
     setRender() {
         this.renderer = new THREE.WebGLRenderer({
@@ -57,7 +58,7 @@ export default class Scene {
             nearPlane,
             farPlane
         )
-        this.camera.position.set(0, 0, 2)
+        this.camera.position.set(0, 0, 10)
 
         this.scene.add(this.camera)
     }
@@ -96,13 +97,6 @@ export default class Scene {
     }
 
     addObjects() {
-        // MeshBasicMaterial
-        // this.material = new THREE.MeshBasicMaterial({
-        //     color: 0xff0f0f,
-        //     wireframe: true
-        //     // side: THREE.DoubleSide
-        // })
-
         // ShaderMaterial
         this.material = new THREE.ShaderMaterial({
             side: THREE.DoubleSide,
@@ -111,9 +105,10 @@ export default class Scene {
             uniforms: {
                 uColor: { value: new THREE.Color(0x51b1f5) },
                 time: { type: 'f', value: this.time },
+                earth: { value: new THREE.TextureLoader().load(earth) }
             }
         })
-        this.geometry = new THREE.PlaneGeometry(1)
+        this.geometry = new THREE.SphereBufferGeometry(5, 30, 30)
 
         this.plane = new THREE.Mesh(this.geometry, this.material)
 
